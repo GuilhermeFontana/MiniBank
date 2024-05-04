@@ -21,7 +21,7 @@ namespace MiniBank.Controllers
             if (String.IsNullOrEmpty(customerInput.Email))
                 return BadRequest("Email field is required");
 
-            string sql = @"INSERT INTO Customer (FIRTS_NAME, LAST_NAME, BIRTH_DATE, EMAIL, ADDRESS) 
+            string sql = @"INSERT INTO Customer (FIRST_NAME, LAST_NAME, BIRTH_DATE, EMAIL, ADDRESS) 
 OUTPUT Inserted.ID
 VALUES(@First_Name, @Last_Name, @Birth_Date, @Email, @Address)";
 
@@ -61,10 +61,10 @@ VALUES(@First_Name, @Last_Name, @Birth_Date, @Email, @Address)";
         [HttpPost("{id}/[action]", Name = "UpdateCustomer")]
         public ActionResult<Customer> Update(int id, [FromBody] CustomerInput customerInput)
         {
-            string sql = $"SELECT * FROM Customer WHERE ID = {id}";
-
             try
             {
+                string sql = $"SELECT * FROM Customer WHERE ID = {id}";
+                
                 SqlServerConnection conn = SqlServerConnection.GetInstance();
 
                 List<Dictionary<string, string>> result = conn.Query(sql);
@@ -103,7 +103,7 @@ VALUES(@First_Name, @Last_Name, @Birth_Date, @Email, @Address)";
                     curCustomer.Email = customerInput.Email.Trim();
                     parameters.Add("Email", customerInput.Email.Trim());
                 }
-                if (!String.IsNullOrEmpty(customerInput.Address) && !curCustomer.Address.Equals(customerInput.Address.Trim()))
+                if (!curCustomer.Address.Equals(customerInput.Address?.Trim()))
                 {
                     curCustomer.Address = customerInput.Address.Trim();
                     parameters.Add("Address", customerInput.Address.Trim());
@@ -111,7 +111,7 @@ VALUES(@First_Name, @Last_Name, @Birth_Date, @Email, @Address)";
 
                 if (parameters.Count > 0)
                 {
-                    sql = $@"UPDATE MyBank.dbo.Customer 
+                    sql = $@"UPDATE Customer 
   SET {String.Join(", ", parameters.Select(x => $"{x.Key} = @{x.Key}").ToList())}
 WHERE ID = {id}";
 

@@ -1,33 +1,34 @@
 ﻿namespace MiniBank.Classes
 {
-    public enum AccountTypes
-    {
-        C,
-        P
-    }
-
     public class Account : AccountInput
     {
-        public Customer Customer { get; set; }
+        public int Number { get; set; }
 
-        public Account(int number, int agency, AccountTypes accountType, double currentBalance, Customer customer) 
-            : base(number, agency, accountType, currentBalance)
+        public Account(int number, int agency, string accountType, double currentBalance)
+            : base(agency, accountType, currentBalance)
         {
-            Customer = customer;
+            Number = number;
         }
-
     }
 
     public class AccountInput
     {
-        public int Number { get; set; }
         public int Agency { get; set; }
-        public AccountTypes AccountType { get; set; }
+        private string _AccountType { get; set; }
+        public string AccountType { 
+            get 
+            { 
+                return _AccountType; 
+            } 
+            set 
+            {
+                _AccountType = value.ToUpper(); 
+            } 
+        }
         public double CurrentBalance { get; set; }
 
-        public AccountInput(int number, int agency, AccountTypes accountType, double currentBalance)
+        public AccountInput(int agency, string accountType, double currentBalance)
         {
-            Number = number;
             Agency = agency;
             AccountType = accountType;
             CurrentBalance = currentBalance;

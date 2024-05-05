@@ -18,7 +18,7 @@ namespace MiniBank.Controllers
 
                 if (accountInput.Agency < 1)
                     return BadRequest($"Agency (ID: {accountInput.Agency}) is invalid");
-             
+
                 string[] accountTypesAvaliable = { "CC", "CP" };
                 if (!accountTypesAvaliable.Contains(accountInput.AccountType))
                     return BadRequest($"{accountInput.AccountType} not is a account type valid");
@@ -45,7 +45,7 @@ VALUES (@Number, @Agency, @AccountType, @CurrentBalance)";
                 SqlServerConnection conn = SqlServerConnection.GetInstance();
 
                 conn.OutputValue(sql, parameters);
-                
+
                 sql = $@"UPDATE Customer 
   SET [ACCOUNT_AGENCY] = @AccountAgency, [ACCOUNT_NUMBER] = @AccountNumber
 WHERE ID = {customerId}";
@@ -65,6 +65,47 @@ WHERE ID = {customerId}";
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("{customerId}/[action]", Name = "LinkCustomer")]
+        public ActionResult<string> LinkCustomer(int customerId, AccountHeader accountHeader)
+        {
+            try
+            {
+                if (customerId == 0)
+                    return BadRequest($"Customer (ID: {customerId}) not found");
+
+                if (accountHeader.Agency < 1 || accountHeader.Number < 1)
+                    return BadRequest($"Number (ID: {accountHeader.Number}) or Agency (ID: {accountHeader.Agency}) is invalid");
+
+                if (!ValidateCustomer(customerId))
+                    return BadRequest($"Customer (ID: {customerId}) not found or already has a linked account");
+
+                if (ValidateNumberAgency(accountHeader.Number, accountHeader.Agency))
+                    return BadRequest($"Account (Number {accountHeader.Number} and Agency {accountHeader.Agency}) not found");
+
+                SqlServerConnection conn = SqlServerConnection.GetInstance();
+
+                string sql = $@"UPDATE Customer 
+  SET [ACCOUNT_AGENCY] = @AccountAgency, [ACCOUNT_NUMBER] = @AccountNumber
+WHERE ID = {customerId}";
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>
+                {
+                    { "AccountNumber", accountHeader.Number },
+                    { "AccountAgency", accountHeader.Agency},
+                };
+
+                conn.OutputValue(sql, parameters);
+
+                return "Customer linked to account";
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        #region PrivateMethods
 
         private bool ValidateCustomer(int customerID)
         {
@@ -88,5 +129,8 @@ WHERE ID = {customerId}";
 
             return result.Count == 0;
         }
+
+        #endregion PrivateMethods
+
     }
 }

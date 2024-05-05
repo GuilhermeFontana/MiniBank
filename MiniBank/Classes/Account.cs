@@ -15,15 +15,16 @@
     {
         public int Agency { get; set; }
         private string _AccountType { get; set; }
-        public string AccountType { 
-            get 
-            { 
-                return _AccountType; 
-            } 
-            set 
+        public string AccountType
+        {
+            get
             {
-                _AccountType = value.ToUpper(); 
-            } 
+                return _AccountType;
+            }
+            set
+            {
+                _AccountType = value.ToUpper();
+            }
         }
         public double CurrentBalance { get; set; }
 
@@ -32,6 +33,19 @@
             Agency = agency;
             AccountType = accountType;
             CurrentBalance = currentBalance;
+        }
+
+    }
+
+    public class AccountHeader
+    {
+        public int Number { get; set; }
+        public int Agency { get; set; }
+
+        public AccountHeader(int number, int agency)
+        {
+            Number = number;
+            Agency = agency;
         }
     }
 }

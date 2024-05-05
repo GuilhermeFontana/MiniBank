@@ -8,10 +8,10 @@ namespace MiniBank.Resources
 
         private static SqlServerConnection? _instance;
 
-        private static readonly string Server = "localhost";
+        private static readonly string Server = "127.0.0.1";
         private static readonly string User = "sa";
         private static readonly string DBname = "MyBank";
-        private static readonly string Password = "blog_6109";
+        private static readonly string Password = "SqlServerDocker1";
 
         private static SqlServerConnection Instance
         {

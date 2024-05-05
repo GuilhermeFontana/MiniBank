@@ -8,11 +8,6 @@ namespace MiniBank.Resources
 
         private static SqlServerConnection? _instance;
 
-        private static readonly string Server = "127.0.0.1";
-        private static readonly string User = "sa";
-        private static readonly string DBname = "MyBank";
-        private static readonly string Password = "SqlServerDocker1";
-
         private static SqlServerConnection Instance
         {
             get
@@ -36,10 +31,10 @@ namespace MiniBank.Resources
         {
             Connection = new SqlConnection(string.Format(
                     "Server={0};User Id={1};Database={2};Password={3};TrustServerCertificate=True",
-                    Server,
-                    User,
-                    DBname,
-                    Password));
+                    Environment.Variables.GetValue<string>("DbCredentials:Host"),
+                    Environment.Variables.GetValue<string>("DbCredentials:Username"),
+                    Environment.Variables.GetValue<string>("DbCredentials:DbName"),
+                    Environment.Variables.GetValue<string>("DbCredentials:Password")));
 
             Connection.Open();
         }

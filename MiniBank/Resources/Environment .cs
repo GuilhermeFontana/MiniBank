@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace MiniBank.Resources
+﻿namespace MiniBank.Resources
 {
     public class Environment
     {

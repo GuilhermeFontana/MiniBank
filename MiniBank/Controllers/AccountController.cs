@@ -19,9 +19,8 @@ namespace MiniBank.Controllers
                 if (accountInput.Agency < 1)
                     return BadRequest($"Agency (ID: {accountInput.Agency}) is invalid");
 
-                string[] accountTypesAvaliable = { "CC", "CP" };
-                if (!accountTypesAvaliable.Contains(accountInput.AccountType))
-                    return BadRequest($"{accountInput.AccountType} not is a account type valid");
+                if (!ValidateAccountType(accountInput.AccountType))
+                    BadRequest($"{accountInput.AccountType} not is a account type valid");
 
                 if (!ValidateCustomer(customerId))
                     return BadRequest($"Customer (ID: {customerId}) not found or already has a linked account");
@@ -106,6 +105,13 @@ WHERE ID = {customerId}";
         }
 
         #region PrivateMethods
+
+        private bool ValidateAccountType(string accountType)
+        {
+            string[] accountTypesAvaliable = { "CC", "CP" };
+
+            return accountTypesAvaliable.Contains(accountType);
+        }
 
         private bool ValidateCustomer(int customerID)
         {

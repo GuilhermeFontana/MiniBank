@@ -41,4 +41,33 @@
             Obs = obs;
         }
     }
+
+    public class AccountTransactionClean
+    {
+        public int ID { get; set; }
+        public DateTime Dthr { get; set; }
+        private string _TransactionType { get; set; }
+        public string TransactionType
+        {
+            get
+            {
+                return _TransactionType;
+            }
+            set
+            {
+                _TransactionType = value.ToUpper();
+            }
+        }
+        public double Value { get; set; }
+        public string? Obs { get; set; }
+
+        public AccountTransactionClean(int iD, DateTime dthr, string transactionType, double value, string? obs)
+        {
+            ID = iD;
+            Dthr = dthr;
+            TransactionType = transactionType;
+            Value = value;
+            Obs = obs;
+        }
+    }
 }

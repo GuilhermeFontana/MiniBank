@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MiniBank.Classes;
 using MiniBank.Resources;
+using System.Globalization;
 
 namespace MiniBank.Controllers
 {
@@ -22,7 +23,7 @@ namespace MiniBank.Controllers
                 if (!ValidateAccountType(accountInput.AccountType))
                     BadRequest($"{accountInput.AccountType} not is a account type valid");
 
-                if (!ValidateCustomer(customerId))
+                if (!ValidateCustomerWithAccount(customerId))
                     return BadRequest($"Customer (ID: {customerId}) not found or already has a linked account");
 
                 int accountNumber = new Random().Next(1, 99999);
@@ -65,7 +66,7 @@ WHERE ID = {customerId}";
             }
         }
 
-        [HttpPost("{customerId}/[action]", Name = "LinkCustomer")]
+        [HttpPost("{customerId}/[action]", Name = "LinkAccountToCustomer")]
         public ActionResult<string> LinkCustomer(int customerId, AccountHeader accountHeader)
         {
             try
@@ -76,7 +77,7 @@ WHERE ID = {customerId}";
                 if (accountHeader.Agency < 1 || accountHeader.Number < 1)
                     return BadRequest($"Number (ID: {accountHeader.Number}) or Agency (ID: {accountHeader.Agency}) is invalid");
 
-                if (!ValidateCustomer(customerId))
+                if (!ValidateCustomerWithAccount(customerId))
                     return BadRequest($"Customer (ID: {customerId}) not found or already has a linked account");
 
                 if (ValidateNumberAgency(accountHeader.Number, accountHeader.Agency))
@@ -104,6 +105,49 @@ WHERE ID = {customerId}";
             }
         }
 
+        [HttpGet("{customerId}/[action]", Name = "GetStatement")]
+        public ActionResult<Statement> Statement(int customerId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            if (startDate > endDate)
+                return BadRequest("Start date greater than end date");
+
+            if (!ValidateCustomerWithoutAccount(customerId))
+                return BadRequest($"Customer (ID: {customerId}) not found or already has a linked account");
+
+            string sql = @$"SELECT at.*, 
+	SUM(at.VALUE) OVER() as TOTAL_VALUE,
+	(SELECT a.CURRENT_BALANCE
+	FROM Account a
+	WHERE a.NUMBER = at.ACCOUNT_NUMBER 
+	AND a.AGENCY = at.ACCOUNT_AGENCY) AS ACCOUNT_CURRENT_BALANCE
+FROM Account_Transaction at
+WHERE EXISTS (SELECT 1 
+	FROM Customer c 
+	WHERE c.ACCOUNT_NUMBER = at.ACCOUNT_NUMBER 
+	AND c.ACCOUNT_AGENCY  = at.ACCOUNT_AGENCY 
+	AND c.ID = {customerId})";
+
+            SqlServerConnection conn = SqlServerConnection.GetInstance();
+
+            var result = conn.Query(sql);
+
+            List<AccountTransactionClean> transactions = result.Select(x => new AccountTransactionClean(
+                int.Parse(x["ID"]),
+                DateTime.Parse(x["DTHR"], CultureInfo.InvariantCulture),
+                x["TRANSACTION_TYPE"],
+                double.Parse(x["VALUE"]),
+                x["OBS"]
+            )).ToList();
+
+            return new Statement(
+                int.Parse(result[0]["ACCOUNT_NUMBER"]),
+                int.Parse(result[0]["ACCOUNT_AGENCY"]),
+                double.Parse(result[0]["ACCOUNT_CURRENT_BALANCE"]),
+                double.Parse(result[0]["TOTAL_VALUE"]),
+                transactions
+            );
+        }
+
         #region PrivateMethods
 
         private bool ValidateAccountType(string accountType)
@@ -113,7 +157,7 @@ WHERE ID = {customerId}";
             return accountTypesAvaliable.Contains(accountType);
         }
 
-        private bool ValidateCustomer(int customerID)
+        private bool ValidateCustomerWithAccount(int customerID)
         {
             string sql = $"SELECT ACCOUNT_NUMBER FROM Customer WHERE ID = {customerID}";
 
@@ -124,6 +168,19 @@ WHERE ID = {customerId}";
                 return false;
 
             return String.IsNullOrEmpty(result[0]["ACCOUNT_NUMBER"]);
+        }
+
+        private bool ValidateCustomerWithoutAccount(int customerID)
+        {
+            string sql = $"SELECT ACCOUNT_NUMBER FROM Customer WHERE ID = {customerID}";
+
+            SqlServerConnection conn = SqlServerConnection.GetInstance();
+            var result = conn.Query(sql);
+
+            if (result.Count == 0)
+                return false;
+
+            return !String.IsNullOrEmpty(result[0]["ACCOUNT_NUMBER"]);
         }
 
         private bool ValidateNumberAgency(int number, int agency)

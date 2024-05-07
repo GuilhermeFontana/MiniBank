@@ -1,4 +1,4 @@
-﻿namespace MiniBank.Classes
+﻿namespace MiniBank.Models
 {
     public class Customer
     {
@@ -30,15 +30,15 @@
 
     public class CustomerInput
     {
-        public string? FirtsName { get; set; }
+        public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? BirthDate { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }
 
-        public CustomerInput(string? firtsName, string? lastName, string? birthDate, string? email, string? address)
+        public CustomerInput(string? firstName, string? lastName, string? birthDate, string? email, string? address)
         {
-            FirtsName = firtsName;
+            FirstName = firstName;
             LastName = lastName;
             Email = email;
             BirthDate = birthDate;

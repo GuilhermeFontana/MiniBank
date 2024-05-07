@@ -1,4 +1,4 @@
-﻿namespace MiniBank.Classes
+﻿namespace MiniBank.Models
 {
     public class AccountTransaction : AccountTransactionInOutput
     {
@@ -44,8 +44,8 @@
 
     public class AccountTransactionClean
     {
-        public int ID { get; set; }
-        public DateTime Dthr { get; set; }
+        public int TransactionId { get; set; }
+        public double Value { get; set; }
         private string _TransactionType { get; set; }
         public string TransactionType
         {
@@ -58,15 +58,15 @@
                 _TransactionType = value.ToUpper();
             }
         }
-        public double Value { get; set; }
+        public DateTime Dthr { get; set; }
         public string? Obs { get; set; }
 
-        public AccountTransactionClean(int iD, DateTime dthr, string transactionType, double value, string? obs)
+        public AccountTransactionClean(int transactionId, double value, string transactionType, DateTime dthr, string? obs)
         {
-            ID = iD;
-            Dthr = dthr;
-            TransactionType = transactionType;
+            TransactionId = transactionId;
             Value = value;
+            TransactionType = transactionType;
+            Dthr = dthr;
             Obs = obs;
         }
     }

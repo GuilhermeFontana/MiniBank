@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Data;
 
-namespace MiniBank.Resources
+namespace MiniBank.Dependencies
 {
     public class SqlServerConnection
     {
@@ -17,6 +18,9 @@ namespace MiniBank.Resources
                     _instance = new SqlServerConnection();
                     _instance.Open();
                 }
+
+                if (_instance.Connection.State == ConnectionState.Closed) 
+                    _instance.Open();
 
                 return _instance;
             }

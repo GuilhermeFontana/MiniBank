@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MiniBank.Classes;
-using MiniBank.Resources;
+using MiniBank.Models;
+using MiniBank.Dependencies;
 
 namespace MiniBank.Controllers
 {

@@ -1,4 +1,4 @@
-﻿namespace MiniBank.Classes
+﻿namespace MiniBank.Models
 {
     public class Account : AccountInput
     {

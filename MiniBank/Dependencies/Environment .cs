@@ -1,4 +1,4 @@
-﻿namespace MiniBank.Resources
+﻿namespace MiniBank.Dependencies
 {
     public class Environment
     {

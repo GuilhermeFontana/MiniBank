@@ -1,6 +1,8 @@
-﻿namespace MiniBank.Models
+﻿using MiniBank.AbstractClasses;
+
+namespace MiniBank.Models
 {
-    public class Statement
+    public class Statement : AToCSV
     {
         public int AccountNumber { get; set; }
         public int AccountAgency { get; set; }
@@ -15,6 +17,29 @@
             CurrentBalance = currentBalance;
             TotalValue = totalValue;
             Transactions = transactions;
+        }
+
+        public override List<string> ToCsvContent()
+        {
+            List<string> statementDictionary = new()
+            {
+                { $"AccountNumber; {AccountNumber};" },
+                { $"AccountAgency;{AccountAgency};" },
+                { $"CurrentBalance;{CurrentBalance};" },
+                { $"TotalValue;{TotalValue};" },
+                { "" },
+                { $"Transactions;" },
+            };
+
+            if (Transactions.Count > 0)
+            {
+                statementDictionary.Add("Value;TransactionType;Dthr;Obs;");
+
+                foreach (AccountTransactionClean transaction in Transactions)
+                    statementDictionary.Add($"{transaction.TransactionType};{transaction.Value};{transaction.Dthr};{transaction.Obs};");
+            }
+
+            return statementDictionary;
         }
     }
 }

@@ -51,18 +51,5 @@ namespace MiniBank.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpGet("{customerId}/[action]", Name = "GetStatement")]
-        public ActionResult<Statement> Statement(int customerId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-        {
-            try
-            {
-                return Service.GetStatement(customerId, startDate, endDate);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
     }
 }
